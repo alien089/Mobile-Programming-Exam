@@ -55,7 +55,7 @@ public class Grid<TGridObject>
     public Vector3 GetWorldPosition(int x, int y)
     {
         //Debug.Log(new Vector3(x, y, 0f) * m_cellSize + new Vector3(1f, 1f, 0f) * m_cellSize * .5f + m_originPosition);
-        return new Vector3(x, y, 0f) * m_cellSize + new Vector3(1f, 1f, 0f) * m_cellSize * .5f + m_originPosition; // changed x,0,z instead of x,y,0
+        return new Vector3(x, 0f, y) * m_cellSize + new Vector3(1f, 0f, 1f) * m_cellSize * .5f + m_originPosition; // changed x,0,z instead of x,y,0
     }
     
     public Vector2Int GetGridPosition(Vector3 worldPosition)
