@@ -23,6 +23,7 @@ public class BoardManager : MonoBehaviour
             pos0.z = 0;
             pos1.x = i;
             pos1.z = m_GridHeight;
+            Gizmos.color = Color.blue;
             Gizmos.DrawLine(pos0, pos1);
         }
 
@@ -32,6 +33,7 @@ public class BoardManager : MonoBehaviour
             pos0.z = i;
             pos1.x = m_GridWidth;
             pos1.z = i;
+            Gizmos.color = Color.blue;
             Gizmos.DrawLine(pos0, pos1);
         }
 
@@ -88,17 +90,12 @@ public class BoardManager : MonoBehaviour
 
     private void Awake()
     {
+        GameManager.instance.EventManager.Register(Constants.MOVEMENT_PLAYER, ChangeTile);
         m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile());
     }
 
-    private void Start()
+    public void ChangeTile(object[] param)
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

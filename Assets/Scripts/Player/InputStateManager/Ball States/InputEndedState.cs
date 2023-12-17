@@ -14,6 +14,6 @@ public class InputEndedState : State<InputState>
     public override void OnUpdate()
     {
         base.OnUpdate();
-        GameManager.instance.EventManager.TriggerEvent(Constants.MOVEMENT_PLAYER, m_InputStatesManager.m_TouchTempPosition, m_InputStatesManager.m_TouchEndPosition);
+        GameManager.instance.EventManager.TriggerEvent(Constants.MOVEMENT_PLAYER, m_InputStatesManager.m_TouchStartPosition, m_InputStatesManager.m_TouchEndPosition);
     }
 }

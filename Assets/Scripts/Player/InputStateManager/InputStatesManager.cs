@@ -7,7 +7,6 @@ using UnityEngine.Playables;
 
 public class InputStateManager : StatesMachine<InputState>
 {
-    public Vector3 m_TouchTempPosition;
     public Vector3 m_TouchStartPosition;
     public Vector3 m_TouchEndPosition = Vector3.zero;
     
