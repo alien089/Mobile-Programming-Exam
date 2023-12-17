@@ -6,5 +6,10 @@ public class Ingreditent
 {
     private IngreditType m_Type;
 
-    public IngreditType Type { get => m_Type; set => m_Type = value; }
+    public IngreditType Type { get => m_Type;}
+
+    public Ingreditent(IngreditType type)
+    {
+        m_Type = type;
+    }
 }
