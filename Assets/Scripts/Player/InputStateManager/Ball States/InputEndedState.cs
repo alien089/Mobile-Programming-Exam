@@ -5,15 +5,15 @@ using UnityEngine;
 
 public class InputEndedState : State<InputState>
 {
-    private InputStateManager m_BallStatesManager;
+    private InputStateManager m_InputStatesManager;
     public InputEndedState(InputState stateID, StatesMachine<InputState> stateMachine = null) : base(stateID, stateMachine)
     {
-        m_BallStatesManager = (InputStateManager)stateMachine;
+        m_InputStatesManager = (InputStateManager)stateMachine;
     }
 
     public override void OnUpdate()
     {
         base.OnUpdate();
-        GameManager.instance.EventManager.TriggerEvent(Constants.MOVEMENT_PLAYER, m_BallStatesManager.m_TouchTempPosition, m_BallStatesManager.m_TouchEndPosition);
+        GameManager.instance.EventManager.TriggerEvent(Constants.MOVEMENT_PLAYER, m_InputStatesManager.m_TouchTempPosition, m_InputStatesManager.m_TouchEndPosition);
     }
 }
