@@ -8,7 +8,7 @@ using UnityEngine.Playables;
 public class InputStateManager : StatesMachine<InputState>
 {
     public Vector3 m_TouchStartPosition;
-    public Vector3 m_TouchEndPosition = Vector3.zero;
+    public Vector3 m_TouchEndPosition = Vector3.positiveInfinity;
     
     public GameObject m_Grid;
 

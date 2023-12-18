@@ -16,4 +16,9 @@ public class Tile
         foreach(Ingreditent ing in ingreditent)
             m_IngredientsStack.Add(ing);
     }
+
+    public void ClearStack()
+    {
+        m_IngredientsStack.Clear();
+    }
 }

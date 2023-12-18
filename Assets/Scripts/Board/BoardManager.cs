@@ -38,28 +38,28 @@ public class BoardManager : MonoBehaviour
             Gizmos.DrawLine(pos0, pos1);
         }
 
-        if (Application.isEditor)
+        if (!Application.isPlaying)
         {
             m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile());
             for (int i = 0; i < m_GridWidth; i++)
             {
                 for (int j = 0; j < m_GridHeight; j++)
                 {
+                    List<Ingreditent> tmp = new List<Ingreditent>();
+
                     if (GetComponent<BoardData>().BreadPositions.Contains(new Vector2(i, j)))
-                    {
-                        List<Ingreditent> tmp = new List<Ingreditent>();
                         tmp.Add(new Ingreditent(IngreditType.Bread));
-                    }
-                        m_Grid.GetGridObject(i, j).AddToStack(tmp);
 
                     else if (GetComponent<BoardData>().CheesePositions.Contains(new Vector2(i, j)))
-                        m_Grid.GetGridObject(i, j).AddToStack(new Ingreditent(IngreditType.Cheese));
+                        tmp.Add(new Ingreditent(IngreditType.Cheese));
 
                     else if (GetComponent<BoardData>().TomatoPositions.Contains(new Vector2(i, j)))
-                        m_Grid.GetGridObject(i, j).AddToStack(new Ingreditent(IngreditType.Tomato));
+                        tmp.Add(new Ingreditent(IngreditType.Tomato));
 
                     else if (GetComponent<BoardData>().SaladPositions.Contains(new Vector2(i, j)))
-                        m_Grid.GetGridObject(i, j).AddToStack(new Ingreditent(IngreditType.Salad));
+                        tmp.Add(new Ingreditent(IngreditType.Salad));
+
+                    m_Grid.GetGridObject(i, j).AddToStack(tmp);
                 }
             }
         }
@@ -95,14 +95,43 @@ public class BoardManager : MonoBehaviour
 
     private void Awake()
     {
-        GameManager.instance.EventManager.Register(Constants.MOVEMENT_PLAYER, ChangeTile);
         m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile());
+        for (int i = 0; i < m_GridWidth; i++)
+        {
+            for (int j = 0; j < m_GridHeight; j++)
+            {
+                List<Ingreditent> tmp = new List<Ingreditent>();
+
+                if (GetComponent<BoardData>().BreadPositions.Contains(new Vector2(i, j)))
+                    tmp.Add(new Ingreditent(IngreditType.Bread));
+
+                else if (GetComponent<BoardData>().CheesePositions.Contains(new Vector2(i, j)))
+                    tmp.Add(new Ingreditent(IngreditType.Cheese));
+
+                else if (GetComponent<BoardData>().TomatoPositions.Contains(new Vector2(i, j)))
+                    tmp.Add(new Ingreditent(IngreditType.Tomato));
+
+                else if (GetComponent<BoardData>().SaladPositions.Contains(new Vector2(i, j)))
+                    tmp.Add(new Ingreditent(IngreditType.Salad));
+
+                m_Grid.GetGridObject(i, j).AddToStack(tmp);
+            }
+        }
+    }
+
+    private void Start()
+    {
+        GameManager.instance.EventManager.Register(Constants.MOVEMENT_PLAYER, ChangeTile);
     }
 
     public void ChangeTile(object[] param)
     {
         Vector3 startPos = (Vector3)param[0];
         Vector3 endPos = (Vector3)(param[1]);
+         
+        if (endPos == Vector3.positiveInfinity) 
+            return;
+
         Vector2 gridPos;
 
         Vector2 dir;
@@ -110,13 +139,20 @@ public class BoardManager : MonoBehaviour
         m_Grid.GetXY(startPos, out int x, out int y);
         gridPos = new Vector2(x, y);
 
-        if (m_Grid.GetGridObject(gridPos).IngredientsStack == null) return;
+        if (m_Grid.GetRefGridObject(gridPos).IngredientsStack == null) 
+            return;
 
-        if (endPos.x > startPos.x) dir = new Vector2(1f,0f);
-        else if (endPos.y > startPos.y) dir = new Vector2(0f, 1f);
-        else if (endPos.y < startPos.y) dir = new Vector2(0f, -1f);
-        else dir = new Vector2(-1f, 0f);
+        if (endPos.x > startPos.x) dir = new Vector2(1f, 0f); //right
+        else if (endPos.y > startPos.y) dir = new Vector2(0f, 1f); //up
+        else if (endPos.y < startPos.y) dir = new Vector2(0f, -1f); //down
+        else dir = new Vector2(-1f, 0f); //left
 
-        if (m_Grid.GetGridObject(gridPos + dir).IngredientsStack == null) return;
+        Vector2 test = gridPos + dir;
+
+        if (m_Grid.GetRefGridObject(gridPos + dir).IngredientsStack == null) 
+            return;
+
+        m_Grid.GetRefGridObject(gridPos + dir).AddToStack(m_Grid.GetRefGridObject(gridPos).IngredientsStack);
+        m_Grid.GetRefGridObject(gridPos).IngredientsStack.Clear();
     }
 }
