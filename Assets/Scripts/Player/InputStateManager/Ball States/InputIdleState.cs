@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class InputdleState : State<InputState>
 {
-    private InputStateManager m_BallStatesManager;
+    private InputStateManager m_InputStatesManager;
     public InputdleState(InputState stateID, StatesMachine<InputState> stateMachine = null) : base(stateID, stateMachine)
     {
-        m_BallStatesManager = (InputStateManager)stateMachine;
+        m_InputStatesManager = (InputStateManager)stateMachine;
     }
 
     public override void OnUpdate()

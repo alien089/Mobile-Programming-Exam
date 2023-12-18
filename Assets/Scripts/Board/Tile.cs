@@ -6,13 +6,14 @@ public class Tile
 {
     private List<Ingreditent> m_IngredientsStack = new List<Ingreditent>();
 
-    public List<Ingreditent> IngredientsStack { get => m_IngredientsStack; set => m_IngredientsStack = value; }
+    public List<Ingreditent> IngredientsStack { get => m_IngredientsStack;}
 
-    public void AddToStack(Ingreditent ingreditent)
+    public void AddToStack(List<Ingreditent> ingreditent)
     {
         if (m_IngredientsStack == null)
             m_IngredientsStack = new List<Ingreditent>();
 
-         m_IngredientsStack.Add(ingreditent);
+        foreach(Ingreditent ing in ingreditent)
+            m_IngredientsStack.Add(ing);
     }
 }

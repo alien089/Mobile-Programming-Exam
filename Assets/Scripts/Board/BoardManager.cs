@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using static TreeEditor.TreeEditorHelper;
 
@@ -45,7 +46,11 @@ public class BoardManager : MonoBehaviour
                 for (int j = 0; j < m_GridHeight; j++)
                 {
                     if (GetComponent<BoardData>().BreadPositions.Contains(new Vector2(i, j)))
-                        m_Grid.GetGridObject(i, j).AddToStack(new Ingreditent(IngreditType.Bread));
+                    {
+                        List<Ingreditent> tmp = new List<Ingreditent>();
+                        tmp.Add(new Ingreditent(IngreditType.Bread));
+                    }
+                        m_Grid.GetGridObject(i, j).AddToStack(tmp);
 
                     else if (GetComponent<BoardData>().CheesePositions.Contains(new Vector2(i, j)))
                         m_Grid.GetGridObject(i, j).AddToStack(new Ingreditent(IngreditType.Cheese));
@@ -96,6 +101,22 @@ public class BoardManager : MonoBehaviour
 
     public void ChangeTile(object[] param)
     {
+        Vector3 startPos = (Vector3)param[0];
+        Vector3 endPos = (Vector3)(param[1]);
+        Vector2 gridPos;
 
+        Vector2 dir;
+
+        m_Grid.GetXY(startPos, out int x, out int y);
+        gridPos = new Vector2(x, y);
+
+        if (m_Grid.GetGridObject(gridPos).IngredientsStack == null) return;
+
+        if (endPos.x > startPos.x) dir = new Vector2(1f,0f);
+        else if (endPos.y > startPos.y) dir = new Vector2(0f, 1f);
+        else if (endPos.y < startPos.y) dir = new Vector2(0f, -1f);
+        else dir = new Vector2(-1f, 0f);
+
+        if (m_Grid.GetGridObject(gridPos + dir).IngredientsStack == null) return;
     }
 }
