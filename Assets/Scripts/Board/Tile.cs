@@ -5,8 +5,18 @@ using UnityEngine;
 public class Tile
 {
     private List<Ingreditent> m_IngredientsStack = new List<Ingreditent>();
+    private int x, y;
+
 
     public List<Ingreditent> IngredientsStack { get => m_IngredientsStack;}
+    public int X { get => x; set => x = value; }
+    public int Y { get => y; set => y = value; }
+
+    public Tile(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
 
     public void AddToStack(List<Ingreditent> ingreditent)
     {

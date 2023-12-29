@@ -40,7 +40,7 @@ public class BoardManager : MonoBehaviour
 
         if (!Application.isPlaying)
         {
-            m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile());
+            m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile(x, y));
             for (int i = 0; i < m_GridWidth; i++)
             {
                 for (int j = 0; j < m_GridHeight; j++)
@@ -94,7 +94,7 @@ public class BoardManager : MonoBehaviour
 
     private void Awake()
     {
-        m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile());
+        m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile(x, y));
         for (int i = 0; i < m_GridWidth; i++)
         {
             for (int j = 0; j < m_GridHeight; j++)
@@ -159,31 +159,35 @@ public class BoardManager : MonoBehaviour
         if (endPos == Vector3.positiveInfinity) 
             return;
 
-        Vector2 startCell;
-        Vector2 endCell;
+        CalcEndPos(startPos, endPos, out int x, out int y);
 
-        m_Grid.GetXY(startPos, out int x, out int y);
-        startCell = new Vector2(x, y);
-        
-        m_Grid.GetXY(endPos, out int a, out int b);
-        endCell = new Vector2(a, b);
-
-        Vector2 dir = Vector2.zero;
-
-        if (endPos.x > startPos.x) dir = new Vector2(1f, 0f); //right
-        else if (endPos.y > startPos.y) dir = new Vector2(0f, 1f); //up
-        else if (endPos.y < startPos.y) dir = new Vector2(0f, -1f); //down
-        else dir = new Vector2(-1f, 0f); //left
-
-        if (endCell.x != startCell.x && endCell.y != startCell.y) return;
-        if (endCell.x == startCell.x && endCell.y == startCell.y) return;
-        if (Mathf.Abs(endCell.x - startCell.x) > 1 || Mathf.Abs(endCell.y - startCell.y) > 1) return;
-        if (m_Grid.GetGridObject(startCell).IngredientsStack.Count == 0 || m_Grid.GetGridObject(endCell).IngredientsStack.Count == 0) return;
+        if (m_Grid.GetGridObject(startPos).IngredientsStack.Count == 0 || m_Grid.GetGridObject(x, y).IngredientsStack.Count == 0) return;
 
         List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
-        List<Ingreditent> ingredient = m_Grid.GetRefGridObject(endPos).IngredientsStack;
+        List<Ingreditent> ingredient = m_Grid.GetRefGridObject(x, y).IngredientsStack;
         
-        m_Grid.GetRefGridObject(endPos).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
+        m_Grid.GetRefGridObject(x, y).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
         m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
+    }
+
+    private void CalcEndPos(Vector3 startPos, Vector3 endPos, out int x, out int y)
+    {
+        Vector2 dir = Vector2.zero;
+
+        float X = endPos.x - startPos.x;
+        float Y = endPos.z - startPos.z;
+
+        if (Mathf.Abs(X) <= GetComponent<BoardData>().DpadSenseX && Mathf.Abs(Y) <= GetComponent<BoardData>().DpadSenseY)
+            dir = Vector2.zero;
+        else if (Mathf.Abs(X) > Mathf.Abs(Y))
+            dir = X > 0 ? new Vector2(1f, 0f) : new Vector2(-1f, 0f); //right || left
+        else
+            dir = Y > 0 ? new Vector2(0f, 1f) : new Vector2(0f, -1f); //up !! down
+
+        m_Grid.GetXY(startPos, out int a, out int b);
+
+        x = a + (int)dir.x;
+        y = b + (int)dir.y;
+
     }
 }
