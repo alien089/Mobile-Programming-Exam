@@ -71,7 +71,7 @@ public class Grid<TGridObject>
     public void GetXY(Vector3 worldPosition, out int x, out int y) 
     {
         x = Mathf.FloorToInt((worldPosition - m_originPosition).x / m_cellSize);
-        y = Mathf.FloorToInt((worldPosition - m_originPosition).y / m_cellSize); // changed to z instead of y
+        y = Mathf.FloorToInt((worldPosition - m_originPosition).z / m_cellSize); // changed to z instead of y
     }
 
     /// <summary>

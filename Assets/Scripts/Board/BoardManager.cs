@@ -68,7 +68,6 @@ public class BoardManager : MonoBehaviour
         {
             for (int j = 0; j < m_GridHeight; j++)
             {
-                //Debug.Log("Node type: " + AssetData.Grid.GetGridObject(i, j).NodeType.ToString());
                 for(int x = 0; x < m_Grid.GetGridObject(i, j).IngredientsStack.Count; x++)
                 {
                     Vector3 pos = m_Grid.GetWorldPosition(i, j);
@@ -117,6 +116,34 @@ public class BoardManager : MonoBehaviour
                 m_Grid.GetGridObject(i, j).AddToStack(tmp);
             }
         }
+
+        for (int i = 0; i < m_GridWidth; i++)
+        {
+            for (int j = 0; j < m_GridHeight; j++)
+            {
+                for (int x = 0; x < m_Grid.GetGridObject(i, j).IngredientsStack.Count; x++)
+                {
+                    Vector3 pos = m_Grid.GetWorldPosition(i, j);
+                    pos = new Vector3(pos.x, x, pos.z);
+                    Color tmp = Color.cyan;
+
+                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Cheese)
+                        tmp = Color.yellow;
+
+                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Salad)
+                        tmp = Color.green;
+
+                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Tomato)
+                        tmp = Color.red;
+
+                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Bread)
+                        tmp = Color.black;
+
+                    GameObject go = Instantiate(GetComponent<BoardData>().Tile, pos, Quaternion.identity, transform);
+                    go.GetComponent<MeshRenderer>().material.color = tmp;
+                }
+            }
+        }
     }
 
     private void Start()
@@ -132,27 +159,24 @@ public class BoardManager : MonoBehaviour
         if (endPos == Vector3.positiveInfinity) 
             return;
 
-        Vector2 gridPos;
-
-        Vector2 dir;
+        Vector2 startCell;
+        Vector2 endCell;
 
         m_Grid.GetXY(startPos, out int x, out int y);
-        gridPos = new Vector2(x, y);
+        startCell = new Vector2(x, y);
+        
+        m_Grid.GetXY(endPos, out int a, out int b);
+        endCell = new Vector2(a, b);
 
-        if (m_Grid.GetRefGridObject(gridPos).IngredientsStack == null) 
-            return;
+        if (endCell.x != startCell.x && endCell.y != startCell.y) return;
+        if (endCell.x == startCell.x && endCell.y == startCell.y) return;
+        if (Mathf.Abs(endCell.x - startCell.x) > 1 || Mathf.Abs(endCell.y - startCell.y) > 1) return;
+        if (m_Grid.GetGridObject(startCell).IngredientsStack.Count == 0 || m_Grid.GetGridObject(endCell).IngredientsStack.Count == 0) return;
 
-        if (endPos.x > startPos.x) dir = new Vector2(1f, 0f); //right
-        else if (endPos.y > startPos.y) dir = new Vector2(0f, 1f); //up
-        else if (endPos.y < startPos.y) dir = new Vector2(0f, -1f); //down
-        else dir = new Vector2(-1f, 0f); //left
-
-        Vector2 test = gridPos + dir;
-
-        if (m_Grid.GetRefGridObject(gridPos + dir).IngredientsStack == null) 
-            return;
-
-        m_Grid.GetRefGridObject(gridPos + dir).AddToStack(m_Grid.GetRefGridObject(gridPos).IngredientsStack);
-        m_Grid.GetRefGridObject(gridPos).IngredientsStack.Clear();
+        List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
+        List<Ingreditent> ingredient = m_Grid.GetRefGridObject(endPos).IngredientsStack;
+        
+        m_Grid.GetRefGridObject(endPos).AddToStack(m_Grid.GetRefGridObject(startPos).IngredientsStack);
+        m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
     }
 }
