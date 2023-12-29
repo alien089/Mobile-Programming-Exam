@@ -17,6 +17,18 @@ public class Tile
             m_IngredientsStack.Add(ing);
     }
 
+    public List<Ingreditent> FlipStack()
+    {
+        List<Ingreditent> rtn = new List<Ingreditent>();   
+
+        for(int i = m_IngredientsStack.Count - 1; i >= 0; i--)
+        {
+            rtn.Add(m_IngredientsStack[i]);
+        }
+
+        return rtn;
+    }
+
     public void ClearStack()
     {
         m_IngredientsStack.Clear();

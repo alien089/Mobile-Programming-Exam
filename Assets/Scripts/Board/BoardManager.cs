@@ -168,6 +168,13 @@ public class BoardManager : MonoBehaviour
         m_Grid.GetXY(endPos, out int a, out int b);
         endCell = new Vector2(a, b);
 
+        Vector2 dir = Vector2.zero;
+
+        if (endPos.x > startPos.x) dir = new Vector2(1f, 0f); //right
+        else if (endPos.y > startPos.y) dir = new Vector2(0f, 1f); //up
+        else if (endPos.y < startPos.y) dir = new Vector2(0f, -1f); //down
+        else dir = new Vector2(-1f, 0f); //left
+
         if (endCell.x != startCell.x && endCell.y != startCell.y) return;
         if (endCell.x == startCell.x && endCell.y == startCell.y) return;
         if (Mathf.Abs(endCell.x - startCell.x) > 1 || Mathf.Abs(endCell.y - startCell.y) > 1) return;
@@ -176,7 +183,7 @@ public class BoardManager : MonoBehaviour
         List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
         List<Ingreditent> ingredient = m_Grid.GetRefGridObject(endPos).IngredientsStack;
         
-        m_Grid.GetRefGridObject(endPos).AddToStack(m_Grid.GetRefGridObject(startPos).IngredientsStack);
+        m_Grid.GetRefGridObject(endPos).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
         m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
     }
 }
