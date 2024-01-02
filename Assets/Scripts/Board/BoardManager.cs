@@ -8,8 +8,8 @@ public class BoardManager : MonoBehaviour
 {
     [SerializeField] private int m_GridWidth;
     [SerializeField] private int m_GridHeight;
-    public Grid<Tile> m_Grid;
-    public Grid<Tile> m_PreviusMoveGrid;
+    private Grid<Tile> m_Grid;
+    private Grid<Tile> m_PreviusMoveGrid;
 
     public Grid<Tile> Grid { get => m_Grid; set => m_Grid = value; }
     public Grid<Tile> PreviusMoveGrid { get => m_PreviusMoveGrid;}
@@ -165,12 +165,17 @@ public class BoardManager : MonoBehaviour
 
         if (m_Grid.GetGridObject(startPos).IngredientsStack.Count == 0 || m_Grid.GetGridObject(x, y).IngredientsStack.Count == 0) return;
 
+        Vector3 calculatedEndPos = new Vector3(x, 0, y);
+
         List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
-        List<Ingreditent> ingredient = m_Grid.GetRefGridObject(x, y).IngredientsStack;
+        List<Ingreditent> ingredient = m_Grid.GetRefGridObject(calculatedEndPos).IngredientsStack;
 
-        m_PreviusMoveGrid = m_Grid;
+        Tile movedFrom = CreateNewTile(startPos); 
+        Tile movedTo = CreateNewTile(calculatedEndPos);
 
-        m_Grid.GetRefGridObject(x, y).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
+        GameManager.instance.EventManager.TriggerEvent(Constants.REGISTER_UNDO, movedFrom, movedTo);
+
+        m_Grid.GetRefGridObject(calculatedEndPos).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
         m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
     }
 
@@ -192,6 +197,15 @@ public class BoardManager : MonoBehaviour
 
         x = a + (int)dir.x;
         y = b + (int)dir.y;
+    }
 
+    private Tile CreateNewTile(Vector3 pos)
+    {
+        m_Grid.GetXY(pos, out int a, out int b);
+        Tile rtn = new Tile(a, b);
+
+        rtn.AddToStack(m_Grid.GetGridObject(pos).IngredientsStack);
+        
+        return rtn;
     }
 }

@@ -103,36 +103,44 @@ public class Grid<TGridObject>
         GetXY(worldPosition, out int x, out int y);
         return GetGridObject(x, y);
     }
+
+    public void SetGridObject(int x, int y, TGridObject value)
+    {
+        if (x >= 0 && y >= 0 && x < m_width && y < m_height)
+        {
+            m_gridArray[x, y] = value;
+            if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y });
+        }
+    }
+
+    public void SetGridObject(Vector3 worldPosition, TGridObject value)
+    {
+        GetXY(worldPosition, out int x, out int y);
+        SetGridObject(x, y, value);
+    }
+
+    public void TriggerGridObjectChanged(int x, int y)
+    {
+        if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y });
+    }
+
+    public event EventHandler<OnGridObjectChangedEventArgs> OnGridObjectChanged;
+    public class OnGridObjectChangedEventArgs : EventArgs
+    {
+        public int x;
+        public int y;
+    }
 }
 
 
 //understand before to use it:
 
-//public event EventHandler<OnGridObjectChangedEventArgs> OnGridObjectChanged;
-//public class OnGridObjectChangedEventArgs : EventArgs
-//{
-//    public int x;
-//    public int y;
-//}
 
 
-//public void SetGridObject(int x, int y, TGridObject value)
-//{
-//    if (x >= 0 && y >= 0 && x < m_width && y < m_height)
-//    {
-//        m_gridArray[x, y] = value;
-//        if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y });
-//    }
-//}
 
-//public void TriggerGridObjectChanged(int x, int y)
-//{
-//    if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y });
-//}
 
-//public void SetGridObject(Vector3 worldPosition, TGridObject value)
-//{
-//    GetXY(worldPosition, out int x, out int y);
-//    SetGridObject(x, y, value);
-//}
+
+
+
+
 

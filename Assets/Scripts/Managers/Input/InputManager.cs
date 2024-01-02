@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Playables;
 
 public class InputManager : MonoBehaviour
@@ -32,18 +33,28 @@ public class InputManager : MonoBehaviour
     {
         if (Input.touchCount == 1)
         {
-            if (Input.GetTouch(0).phase == TouchPhase.Began) { m_InputStateManager.ChangeState(InputState.Began); return true; }
-            else if (Input.GetTouch(0).phase == TouchPhase.Moved)
+            Touch touch = Input.GetTouch(0);
+            // Verifica se il tocco è sulla UI
+            if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
             {
-                m_InputStateManager.ChangeState(InputState.Moved);
-                return true;
+                // Il tocco è sulla UI, non cambiare lo stato di gioco
+                return false;
             }
-            else if (Input.GetTouch(0).phase == TouchPhase.Ended || Input.GetTouch(0).phase == TouchPhase.Canceled)
+            else
             {
-                m_InputStateManager.ChangeState(InputState.Ended);
-                return true;
+                if (touch.phase == TouchPhase.Began) { m_InputStateManager.ChangeState(InputState.Began); return true; }
+                else if (touch.phase == TouchPhase.Moved)
+                {
+                    m_InputStateManager.ChangeState(InputState.Moved);
+                    return true;
+                }
+                else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                {
+                    m_InputStateManager.ChangeState(InputState.Ended);
+                    return true;
+                }
+                else { return true; }
             }
-            else { return true; }
         }
         else { m_InputStateManager.ChangeState(InputState.Idle); return false; }
     }
