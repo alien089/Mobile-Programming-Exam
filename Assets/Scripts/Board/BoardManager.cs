@@ -9,10 +9,8 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private int m_GridWidth;
     [SerializeField] private int m_GridHeight;
     private Grid<Tile> m_Grid;
-    private Grid<Tile> m_PreviusMoveGrid;
 
     public Grid<Tile> Grid { get => m_Grid; set => m_Grid = value; }
-    public Grid<Tile> PreviusMoveGrid { get => m_PreviusMoveGrid;}
 
     private void OnDrawGizmos()
     {
@@ -157,7 +155,7 @@ public class BoardManager : MonoBehaviour
     {
         Vector3 startPos = (Vector3)param[0];
         Vector3 endPos = (Vector3)(param[1]);
-         
+          
         if (endPos == Vector3.positiveInfinity) 
             return;
 
