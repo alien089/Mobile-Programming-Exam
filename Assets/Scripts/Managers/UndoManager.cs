@@ -22,6 +22,7 @@ public class UndoManager : MonoBehaviour
     public void UndoMove(object[] param)
     {
         BoardManager boardManager = (BoardManager)param[0];
+        boardManager.Undo = true;
         boardManager.Grid.SetGridObject(m_MoveFrom.Tile.X, m_MoveFrom.Tile.Y, m_MoveFrom.Tile);
         boardManager.Grid.SetGridObject(m_MoveTo.Tile.X, m_MoveTo.Tile.Y, m_MoveTo.Tile);
     }

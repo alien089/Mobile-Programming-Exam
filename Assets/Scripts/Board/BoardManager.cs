@@ -9,8 +9,10 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private int m_GridWidth;
     [SerializeField] private int m_GridHeight;
     private Grid<Tile> m_Grid;
+    private bool m_Undo = false;
 
     public Grid<Tile> Grid { get => m_Grid; set => m_Grid = value; }
+    public bool Undo { get => m_Undo; set => m_Undo = value; }
 
     private void OnDrawGizmos()
     {
@@ -153,28 +155,35 @@ public class BoardManager : MonoBehaviour
 
     public void ChangeTile(object[] param)
     {
-        Vector3 startPos = (Vector3)param[0];
-        Vector3 endPos = (Vector3)(param[1]);
-          
-        if (endPos == Vector3.positiveInfinity) 
-            return;
+        if(!m_Undo)
+        {
+            Vector3 startPos = (Vector3)param[0];
+            Vector3 endPos = (Vector3)(param[1]);
 
-        CalcEndPos(startPos, endPos, out int x, out int y);
+            if (endPos == Vector3.positiveInfinity)
+                return;
 
-        if (m_Grid.GetGridObject(startPos).IngredientsStack.Count == 0 || m_Grid.GetGridObject(x, y).IngredientsStack.Count == 0) return;
+            CalcEndPos(startPos, endPos, out int x, out int y);
 
-        Vector3 calculatedEndPos = new Vector3(x, 0, y);
+            if (m_Grid.GetGridObject(startPos).IngredientsStack.Count == 0 || m_Grid.GetGridObject(x, y).IngredientsStack.Count == 0) return;
 
-        List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
-        List<Ingreditent> ingredient = m_Grid.GetRefGridObject(calculatedEndPos).IngredientsStack;
+            Vector3 calculatedEndPos = new Vector3(x, 0, y);
 
-        Tile movedFrom = CreateNewTile(startPos); 
-        Tile movedTo = CreateNewTile(calculatedEndPos);
+            List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
+            List<Ingreditent> ingredient = m_Grid.GetRefGridObject(calculatedEndPos).IngredientsStack;
 
-        GameManager.instance.EventManager.TriggerEvent(Constants.REGISTER_UNDO, movedFrom, movedTo);
+            Tile movedFrom = CreateNewTile(startPos);
+            Tile movedTo = CreateNewTile(calculatedEndPos);
 
-        m_Grid.GetRefGridObject(calculatedEndPos).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
-        m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
+            GameManager.instance.EventManager.TriggerEvent(Constants.REGISTER_UNDO, movedFrom, movedTo);
+
+            m_Grid.GetRefGridObject(calculatedEndPos).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
+            m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
+        }
+        else
+        {
+            m_Undo = false;
+        }
     }
 
     private void CalcEndPos(Vector3 startPos, Vector3 endPos, out int x, out int y)
