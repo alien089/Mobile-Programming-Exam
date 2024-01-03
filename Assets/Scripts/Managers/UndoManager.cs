@@ -25,6 +25,7 @@ public class UndoManager : MonoBehaviour
         boardManager.Undo = true;
         boardManager.Grid.SetGridObject(m_MoveFrom.Tile.X, m_MoveFrom.Tile.Y, m_MoveFrom.Tile);
         boardManager.Grid.SetGridObject(m_MoveTo.Tile.X, m_MoveTo.Tile.Y, m_MoveTo.Tile);
+        GameManager.instance.EventManager.TriggerEvent(Constants.GENERATE_TILES, boardManager.GridWidth, boardManager.GridHeight, boardManager);
     }
 }
 

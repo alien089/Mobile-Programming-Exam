@@ -13,6 +13,8 @@ public class BoardManager : MonoBehaviour
 
     public Grid<Tile> Grid { get => m_Grid; set => m_Grid = value; }
     public bool Undo { get => m_Undo; set => m_Undo = value; }
+    public int GridWidth { get => m_GridWidth; set => m_GridWidth = value; }
+    public int GridHeight { get => m_GridHeight; set => m_GridHeight = value; }
 
     private void OnDrawGizmos()
     {
@@ -118,39 +120,12 @@ public class BoardManager : MonoBehaviour
                 m_Grid.GetGridObject(i, j).AddToStack(tmp);
             }
         }
-
-        for (int i = 0; i < m_GridWidth; i++)
-        {
-            for (int j = 0; j < m_GridHeight; j++)
-            {
-                for (int x = 0; x < m_Grid.GetGridObject(i, j).IngredientsStack.Count; x++)
-                {
-                    Vector3 pos = m_Grid.GetWorldPosition(i, j);
-                    pos = new Vector3(pos.x, x, pos.z);
-                    Color tmp = Color.cyan;
-
-                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Cheese)
-                        tmp = Color.yellow;
-
-                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Salad)
-                        tmp = Color.green;
-
-                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Tomato)
-                        tmp = Color.red;
-
-                    if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Bread)
-                        tmp = Color.black;
-
-                    GameObject go = Instantiate(GetComponent<BoardData>().Tile, pos, Quaternion.identity, transform);
-                    go.GetComponent<MeshRenderer>().material.color = tmp;
-                }
-            }
-        }
     }
 
     private void Start()
     {
         GameManager.instance.EventManager.Register(Constants.MOVEMENT_PLAYER, ChangeTile);
+        GameManager.instance.EventManager.TriggerEvent(Constants.GENERATE_TILES, m_GridWidth, m_GridHeight, this);
     }
 
     public void ChangeTile(object[] param)
@@ -179,6 +154,9 @@ public class BoardManager : MonoBehaviour
 
             m_Grid.GetRefGridObject(calculatedEndPos).AddToStack(m_Grid.GetRefGridObject(startPos).FlipStack());
             m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
+
+            GameManager.instance.EventManager.TriggerEvent(Constants.GENERATE_TILES, m_GridWidth, m_GridHeight, this);
+            GameManager.instance.EventManager.TriggerEvent(Constants.WIN_GAME, this);
         }
         else
         {
