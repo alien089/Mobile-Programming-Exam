@@ -28,7 +28,8 @@ public class BoardTilesManager : MonoBehaviour
                 for (int x = 0; x < boardManager.Grid.GetGridObject(i, j).IngredientsStack.Count; x++)
                 {
                     Vector3 pos = boardManager.Grid.GetWorldPosition(i, j);
-                    pos = new Vector3(pos.x, x, pos.z);
+                    pos = new Vector3(pos.x, x*0.3f, pos.z);
+
                     Color tmp = Color.cyan;
 
                     if (boardManager.Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Cheese)

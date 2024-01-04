@@ -144,6 +144,8 @@ public class BoardManager : MonoBehaviour
 
             Vector3 calculatedEndPos = new Vector3(x, 0, y);
 
+            if (m_Grid.GetGridObject(startPos).X == m_Grid.GetGridObject(calculatedEndPos).X && m_Grid.GetGridObject(startPos).Y == m_Grid.GetGridObject(calculatedEndPos).Y) return;
+
             List<Ingreditent> ingredients = m_Grid.GetRefGridObject(startPos).IngredientsStack;
             List<Ingreditent> ingredient = m_Grid.GetRefGridObject(calculatedEndPos).IngredientsStack;
 
