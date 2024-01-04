@@ -9,12 +9,13 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private int m_GridWidth;
     [SerializeField] private int m_GridHeight;
     private Grid<Tile> m_Grid;
-    private bool m_Undo = false;
+    private BoardData m_BoardData; 
+    public bool Undo = false;
 
-    public Grid<Tile> Grid { get => m_Grid; set => m_Grid = value; }
-    public bool Undo { get => m_Undo; set => m_Undo = value; }
-    public int GridWidth { get => m_GridWidth; set => m_GridWidth = value; }
-    public int GridHeight { get => m_GridHeight; set => m_GridHeight = value; }
+    public Grid<Tile> Grid { get => m_Grid; }
+    public int GridWidth { get => m_GridWidth; }
+    public int GridHeight { get => m_GridHeight; }
+    public BoardData BoardData { get => m_BoardData; }
 
     private void OnDrawGizmos()
     {
@@ -75,7 +76,7 @@ public class BoardManager : MonoBehaviour
                 for(int x = 0; x < m_Grid.GetGridObject(i, j).IngredientsStack.Count; x++)
                 {
                     Vector3 pos = m_Grid.GetWorldPosition(i, j);
-                    pos = new Vector3(pos.x, x, pos.z);
+                    pos = new Vector3(pos.x, x*0.3f, pos.z);
 
                     if (m_Grid.GetGridObject(i, j).IngredientsStack[x].Type == IngreditType.Cheese)
                         Gizmos.color = Color.yellow;
@@ -98,6 +99,7 @@ public class BoardManager : MonoBehaviour
 
     private void Awake()
     {
+        m_BoardData = GetComponent<BoardData>();
         m_Grid = new Grid<Tile>(m_GridWidth, m_GridHeight, 1, transform.position, (int x, int y) => new Tile(x, y));
         for (int i = 0; i < m_GridWidth; i++)
         {
@@ -105,16 +107,16 @@ public class BoardManager : MonoBehaviour
             {
                 List<Ingreditent> tmp = new List<Ingreditent>();
 
-                if (GetComponent<BoardData>().BreadPositions.Contains(new Vector2(i, j)))
+                if (m_BoardData.BreadPositions.Contains(new Vector2(i, j)))
                     tmp.Add(new Ingreditent(IngreditType.Bread));
 
-                else if (GetComponent<BoardData>().CheesePositions.Contains(new Vector2(i, j)))
+                else if (m_BoardData.CheesePositions.Contains(new Vector2(i, j)))
                     tmp.Add(new Ingreditent(IngreditType.Cheese));
 
-                else if (GetComponent<BoardData>().TomatoPositions.Contains(new Vector2(i, j)))
+                else if (m_BoardData.TomatoPositions.Contains(new Vector2(i, j)))
                     tmp.Add(new Ingreditent(IngreditType.Tomato));
 
-                else if (GetComponent<BoardData>().SaladPositions.Contains(new Vector2(i, j)))
+                else if (m_BoardData.SaladPositions.Contains(new Vector2(i, j)))
                     tmp.Add(new Ingreditent(IngreditType.Salad));
 
                 m_Grid.GetGridObject(i, j).AddToStack(tmp);
@@ -126,11 +128,12 @@ public class BoardManager : MonoBehaviour
     {
         GameManager.instance.EventManager.Register(Constants.MOVEMENT_PLAYER, ChangeTile);
         GameManager.instance.EventManager.TriggerEvent(Constants.GENERATE_TILES, m_GridWidth, m_GridHeight, this);
+
     }
 
     public void ChangeTile(object[] param)
     {
-        if(!m_Undo)
+        if(!Undo)
         {
             Vector3 startPos = (Vector3)param[0];
             Vector3 endPos = (Vector3)(param[1]);
@@ -140,6 +143,8 @@ public class BoardManager : MonoBehaviour
 
             CalcEndPos(startPos, endPos, out int x, out int y);
 
+            if (m_Grid.GetGridObject(startPos) == null || m_Grid.GetGridObject(x, y) == null) return;
+            if (m_Grid.GetGridObject(startPos).IngredientsStack == null || m_Grid.GetGridObject(x, y).IngredientsStack == null) return;
             if (m_Grid.GetGridObject(startPos).IngredientsStack.Count == 0 || m_Grid.GetGridObject(x, y).IngredientsStack.Count == 0) return;
 
             Vector3 calculatedEndPos = new Vector3(x, 0, y);
@@ -158,11 +163,11 @@ public class BoardManager : MonoBehaviour
             m_Grid.GetRefGridObject(startPos).IngredientsStack.Clear();
 
             GameManager.instance.EventManager.TriggerEvent(Constants.GENERATE_TILES, m_GridWidth, m_GridHeight, this);
-            GameManager.instance.EventManager.TriggerEvent(Constants.WIN_GAME, this);
+            GameManager.instance.EventManager.TriggerEvent(Constants.WIN_GAME, this, calculatedEndPos); 
         }
         else
         {
-            m_Undo = false;
+            Undo = false;
         }
     }
 
@@ -173,7 +178,7 @@ public class BoardManager : MonoBehaviour
         float X = endPos.x - startPos.x;
         float Y = endPos.z - startPos.z;
 
-        if (Mathf.Abs(X) <= GetComponent<BoardData>().DpadSenseX && Mathf.Abs(Y) <= GetComponent<BoardData>().DpadSenseY)
+        if (Mathf.Abs(X) <= m_BoardData.DpadSenseX && Mathf.Abs(Y) <= m_BoardData.DpadSenseY)
             dir = Vector2.zero;
         else if (Mathf.Abs(X) > Mathf.Abs(Y))
             dir = X > 0 ? new Vector2(1f, 0f) : new Vector2(-1f, 0f); //right || left

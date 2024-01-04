@@ -8,4 +8,5 @@ public static class Constants
     public static string DO_UNDO = "DoUndo";
     public static string GENERATE_TILES = "CreateTiles";
     public static string WIN_GAME = "WinGame";
+    public static string SHOW_WIN = "ShowWin";
 }
